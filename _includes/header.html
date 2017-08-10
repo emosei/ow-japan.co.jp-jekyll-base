@@ -1,66 +1,45 @@
-<!DOCTYPE HTML>
-<!--
-	Arcana by HTML5 UP
-	html5up.net | @n33co
-	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
--->
-<html>
-	<head>
-		<title>OpenWorks</title>
-		<meta http-equiv="content-type" content="text/html; charset=utf-8" />
-		<meta name="description" content="" />
-		<meta name="keywords" content="" />
-		<!--[if lte IE 8]><script src="{{ site.baseurl }}/assets/css/ie/html5shiv.js"></script><![endif]-->
-		<script src="{{ site.baseurl }}/assets/js/jquery.min.js"></script>
-		<script src="{{ site.baseurl }}/assets/js/jquery.dropotron.min.js"></script>
-		<script src="{{ site.baseurl }}/assets/js/skel.min.js"></script>
-		<script src="{{ site.baseurl }}/assets/js/skel-layers.min.js"></script>
-		<script src="{{ site.baseurl }}/assets/js/init.js"></script>
-		<noscript>
-			<link rel="stylesheet" href="{{ site.baseurl }}/assets/css/skel.css" />
-			<link rel="stylesheet" href="{{ site.baseurl }}/assets/css/style.css" />
-			<link rel="stylesheet" href="{{ site.baseurl }}/assets/css/style-wide.css" />
-		</noscript>
-		<!--[if lte IE 8]><link rel="stylesheet" href="{{ site.baseurl }}/assets/css/ie/v8.css" /><![endif]-->
-	</head>
-	<body>
+<a href="" id="top"></a>
+<div class='contain-to-grid sticky'>
+  <nav class='top-bar' data-options='sticky_on: large' data-topbar=''>
+    <ul class='title-area'>
+      <li class='name'>
+        <h1>
+          <a href="{{site.url}}/index.html">
+            <img alt="" src="{{site.url}}/images/logo-bordered.png" />
+          </a>
+        </h1>
+      </li>
+      <li class='toggle-topbar menu-icon'>
+        <a href='#'>Menu</a>
+      </li>
+    </ul>
+    <section class='top-bar-section'>
+      <ul class="right">
+        {% for item in site.data.nav %}
+          {% if item.section_id == page.section_id %}
+            {% assign active_class = "active" %}
+          {% else %}
+            {% assign active_class = "" %}
+          {% endif %}
 
-		<!-- Header -->
-			<div id="header">
-						
-				<!-- Logo -->
-					<h1><a href="{{ site.baseurl }}/index.html" id="logo">OpenWorks <em> - For the life of worthy -</em></a></h1>
-				
-				<!-- Nav -->
-					<nav id="nav">
-						<ul>
-							{% assign current = page.url | downcase | split: '/' %}
-							<li {% if current[1] == 'index.html' %}class="current"{% endif %}><a href="{{ site.baseurl }}/index.html">Home</a></li>
-							<li>
-								<a href="">Dropdown</a>
-								<ul>
-									<li><a href="#">Lorem dolor</a></li>
-									<li><a href="#">Magna phasellus</a></li>
-									<li><a href="#">Etiam sed tempus</a></li>
-									<li>
-										<a href="">Submenu</a>
-										<ul>
-											<li><a href="#">Lorem dolor</a></li>
-											<li><a href="#">Phasellus magna</a></li>
-											<li><a href="#">Magna phasellus</a></li>
-											<li><a href="#">Etiam nisl</a></li>
-											<li><a href="#">Veroeros feugiat</a></li>
-										</ul>
-									</li>
-									<li><a href="#">Veroeros feugiat</a></li>
-								</ul>
-							</li>
-							<li {% if current[1] == 'blog' %}class="current"{% endif %}><a href="{{ site.baseurl }}/blog">Blog</a></li>
-							<li {% if current[1] == 'left-sidebar.html' %}class="current"{% endif %}><a href="{{ site.baseurl }}/left-sidebar.html">Left Sidebar</a></li>
-							<li {% if current[1] == 'right-sidebar.html' %}class="current"{% endif %}><a href="{{ site.baseurl }}/right-sidebar.html">Right Sidebar</a></li>
-							<li {% if current[1] == 'two-sidebar.html' %}class="current"{% endif %}><a href="{{ site.baseurl }}/two-sidebar.html">Two Sidebar</a></li>
-							<li {% if current[1] == 'no-sidebar.html' %}class="current"{% endif %}><a href="{{ site.baseurl }}/no-sidebar.html">No Sidebar</a></li>
-						</ul>
-					</nav>
-
-			</div>
+          {% if item.children %}
+            <li class="has-dropdown {{active_class}}">
+              <a href="{{site.url}}/{{ item.path }}">{{ item.name }}</a>
+              <ul class='dropdown'>
+                {% for child in item.children %}
+                  <li>
+                    <a href="{{site.url}}/{{ child.path }}">{{ child.name }}</a>
+                  </li>
+                {% endfor %}
+              </ul>
+            </li>
+          {% else %}
+            <li class="{{active_class}}">
+              <a href="{{site.url}}/{{ item.path }}">{{ item.name }}</a>
+            </li>
+          {% endif %}
+        {% endfor %}
+      </ul>
+    </section>
+  </nav>
+</div>

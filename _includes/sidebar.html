@@ -66,7 +66,7 @@
   <h3>Tags</h3>
     {% for tag in site.tags %}
       {% capture name %}{{ tag[0] }}{% endcapture %}
-      <h2>{{ name }} ({{ site.tags[name] | size }})</h2>
+      <h4>{{ name }} ({{ site.tags[name] | size }})</h4>
       <ul class="posts">
       {% for post in site.tags[name] %}
         <li>

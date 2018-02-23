@@ -5,13 +5,6 @@
 
   <title>{% if page.title %}{{ page.title }}{% else %}{{ site.title }}{% endif %}</title>
   <meta name="description" content="{% if page.excerpt %}{{ page.excerpt | strip_html | strip_newlines | truncate: 160 }}{% else %}{{ site.description }}{% endif %}">
-  <meta name="twitter:card" content="summary_large_image" />
-  <meta property="og:title" content="オープンワークス ltd" />
-  <meta property="og:type" content="website" />
-  <meta property="og:description" content="OpenWorksのHP" />
-  <meta property="og:url" content="https://www.ow-japan.com" />
-  <meta property="og:site_name" content="-OPEN WORKS-" />
-  <meta property="og:image" content="https://d33wubrfki0l68.cloudfront.net/faae58a2dbf4f84e28c297b3ccd57d6b77035040/af2c3/images/logo-header.png" />
 
   <link rel="stylesheet" href="{{ "/css/foundation.css" | prepend: site.baseurl }}">
   <link rel="stylesheet" href="{{ "/css/style.css" | prepend: site.baseurl }}">

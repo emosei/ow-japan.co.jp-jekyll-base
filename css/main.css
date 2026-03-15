@@ -906,8 +906,22 @@ img { max-width: 100%; height: auto; }
   background: var(--accent);
   border-top: none;
 }
-.cta-section h2 { color: #fff; }
-.cta-section p { color: rgba(255,255,255,0.8); }
+.cta-inner {
+  max-width: 600px;
+  margin: 0 auto;
+  text-align: center;
+}
+.cta-section h2 {
+  color: #fff;
+  font-size: clamp(1.5rem, 3.5vw, 2.25rem);
+  margin-bottom: 1rem;
+}
+.cta-section p {
+  color: rgba(255, 255, 255, 0.85);
+  margin-bottom: 2.5rem;
+  font-size: 0.95rem;
+  line-height: 1.8;
+}
 .cta-section .btn-primary {
   background: #fff;
   color: var(--accent);
@@ -915,22 +929,6 @@ img { max-width: 100%; height: auto; }
 .cta-section .btn-primary:hover {
   background: #f0faf5;
   box-shadow: 0 4px 20px rgba(0,0,0,0.15);
-}
-.cta-section .cta-contact-info { color: rgba(255,255,255,0.75); }
-.cta-inner {
-  max-width: 600px;
-  margin: 0 auto;
-  text-align: center;
-}
-.cta-section h2 {
-  font-size: clamp(1.5rem, 3.5vw, 2.25rem);
-  margin-bottom: 1rem;
-}
-.cta-section p {
-  color: var(--text-muted);
-  margin-bottom: 2.5rem;
-  font-size: 0.95rem;
-  line-height: 1.8;
 }
 .cta-actions {
   display: flex;
@@ -944,7 +942,13 @@ img { max-width: 100%; height: auto; }
   flex-wrap: wrap;
   justify-content: center;
   font-size: 0.85rem;
-  color: var(--text-muted);
+  color: rgba(255, 255, 255, 0.8);
+}
+.cta-contact-info a {
+  color: #fff;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }
 
 /* ===========================

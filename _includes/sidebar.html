@@ -12,30 +12,34 @@
 </div>
 {% endif %}
 
-{% if site.categories.size > 0 %}
 <div class="sidebar-widget">
   <h3>カテゴリ</h3>
-  <ul>
-    {% for category in site.categories %}
-      <li>
-        <span>{{ category[0] }}</span>
-        <span style="color:var(--text-muted); font-size:0.72rem; margin-left:0.25rem">({{ category[1] | size }})</span>
-      </li>
-    {% endfor %}
-  </ul>
+  <div class="sidebar-categories">
+    <a href="/blog/category/tech-tips" class="sidebar-category-badge">
+      技術Tips
+      {% assign count = site.categories['tech-tips'] | size %}
+      {% if count > 0 %}<span>{{ count }}</span>{% endif %}
+    </a>
+    <a href="/blog/category/it-trends" class="sidebar-category-badge">
+      ITトレンド
+      {% assign count = site.categories['it-trends'] | size %}
+      {% if count > 0 %}<span>{{ count }}</span>{% endif %}
+    </a>
+    <a href="/blog/category/tech-verification" class="sidebar-category-badge">
+      技術検証
+      {% assign count = site.categories['tech-verification'] | size %}
+      {% if count > 0 %}<span>{{ count }}</span>{% endif %}
+    </a>
+  </div>
 </div>
-{% endif %}
 
 {% if site.tags.size > 0 %}
 <div class="sidebar-widget">
   <h3>タグ</h3>
-  <ul>
+  <div class="sidebar-tags">
     {% for tag in site.tags %}
-      <li>
-        <span>{{ tag[0] }}</span>
-        <span style="color:var(--text-muted); font-size:0.72rem; margin-left:0.25rem">({{ tag[1] | size }})</span>
-      </li>
+      <span class="sidebar-tag">{{ tag[0] }}</span>
     {% endfor %}
-  </ul>
+  </div>
 </div>
 {% endif %}

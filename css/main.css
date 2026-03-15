@@ -1023,3 +1023,123 @@ img { max-width: 100%; height: auto; }
   .hero h1 { font-size: 2.2rem; }
   .contact-card { padding: 1.5rem; }
 }
+
+/* ── Blog Hero ─────────────────────────────────────────────── */
+.blog-hero {
+  padding: 2.5rem 0 2rem;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 2rem;
+}
+.blog-hero h1 {
+  font-size: 2rem;
+  margin: 0.5rem 0 0.75rem;
+}
+.blog-hero p {
+  color: var(--text-muted);
+  margin-bottom: 1.25rem;
+}
+.blog-categories-nav {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+.category-badge {
+  display: inline-block;
+  padding: 0.35rem 0.85rem;
+  background: var(--accent-light);
+  color: var(--accent);
+  border-radius: 2rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background 0.2s, color 0.2s;
+}
+.category-badge:hover {
+  background: var(--accent);
+  color: #fff;
+}
+
+/* ── Post category link (inline in post-meta) ──────────────── */
+.post-category-link {
+  color: var(--accent);
+  font-weight: 600;
+  font-size: 0.8rem;
+  text-decoration: none;
+}
+.post-category-link:hover { text-decoration: underline; }
+
+/* ── Category Hero (category pages) ───────────────────────── */
+.category-hero {
+  padding: 2rem 0 1.75rem;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 2rem;
+}
+.category-hero h1 {
+  font-size: 1.75rem;
+  margin: 0.4rem 0 0.6rem;
+}
+.category-hero p {
+  color: var(--text-muted);
+  margin-bottom: 1rem;
+}
+.btn-back {
+  font-size: 0.85rem;
+  color: var(--accent);
+  text-decoration: none;
+  font-weight: 600;
+}
+.btn-back:hover { text-decoration: underline; }
+
+/* ── Sidebar categories as badges ──────────────────────────── */
+.sidebar-categories {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.sidebar-category-badge {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 0.75rem;
+  background: #f5f5f5;
+  border-radius: 0.5rem;
+  font-size: 0.85rem;
+  font-weight: 500;
+  text-decoration: none;
+  color: var(--text);
+  transition: background 0.2s, color 0.2s;
+}
+.sidebar-category-badge:hover {
+  background: var(--accent-light);
+  color: var(--accent);
+}
+.sidebar-category-badge span {
+  background: var(--accent);
+  color: #fff;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 0.1rem 0.45rem;
+  border-radius: 1rem;
+}
+
+/* ── Sidebar tags ───────────────────────────────────────────── */
+.sidebar-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+.sidebar-tag {
+  display: inline-block;
+  padding: 0.25rem 0.6rem;
+  background: #f0f0f0;
+  border-radius: 0.3rem;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+/* ── No posts ───────────────────────────────────────────────── */
+.no-posts-message, .no-posts {
+  padding: 3rem 0;
+  text-align: center;
+  color: var(--text-muted);
+}

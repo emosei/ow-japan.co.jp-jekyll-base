@@ -3,27 +3,46 @@ layout: blog
 section_id: blog
 ---
 
-{% for post in paginator.posts %}
-<article class="post-card">
-  <div class="post-meta">
-    <time>{{ post.date | date: "%Y年%m月%d日" }}</time>
-    {% if post.author %}
-      <span class="post-meta-sep">·</span>
-      <span>{{ post.author }}</span>
-    {% endif %}
-    {% if post.categories.size > 0 %}
-      <span class="post-meta-sep">·</span>
-      <span>
-        {% for cat in post.categories %}
-          {{ cat }}{% unless forloop.last %}, {% endunless %}
-        {% endfor %}
-      </span>
-    {% endif %}
+<div class="blog-hero">
+  <span class="section-label">Blog</span>
+  <h1>テックブログ</h1>
+  <p>モバイルアプリ・Web開発の技術情報やIT業界のトレンドを発信しています。</p>
+  <div class="blog-categories-nav">
+    <a href="/blog/category/tech-tips" class="category-badge">技術Tips</a>
+    <a href="/blog/category/it-trends" class="category-badge">ITトレンド</a>
+    <a href="/blog/category/tech-verification" class="category-badge">技術検証</a>
   </div>
-  <h2><a href="{{ post.url | prepend: site.baseurl }}">{{ post.title }}</a></h2>
-  <p>{{ post.excerpt | strip_html | truncate: 200 }}</p>
-  <a href="{{ post.url | prepend: site.baseurl }}" class="btn-read">続きを読む →</a>
-</article>
-{% endfor %}
+</div>
+
+{% if paginator.posts.size > 0 %}
+  {% for post in paginator.posts %}
+  <article class="post-card">
+    <div class="post-meta">
+      <time>{{ post.date | date: "%Y年%m月%d日" }}</time>
+      {% if post.author %}
+        <span class="post-meta-sep">·</span>
+        <span>{{ post.author }}</span>
+      {% endif %}
+      {% if post.categories.size > 0 %}
+        <span class="post-meta-sep">·</span>
+        {% for cat in post.categories %}
+          {% if cat == "tech-tips" %}<a href="/blog/category/tech-tips" class="post-category-link">技術Tips</a>
+          {% elsif cat == "it-trends" %}<a href="/blog/category/it-trends" class="post-category-link">ITトレンド</a>
+          {% elsif cat == "tech-verification" %}<a href="/blog/category/tech-verification" class="post-category-link">技術検証</a>
+          {% else %}<span>{{ cat }}</span>
+          {% endif %}
+        {% endfor %}
+      {% endif %}
+    </div>
+    <h2><a href="{{ post.url | prepend: site.baseurl }}">{{ post.title }}</a></h2>
+    <p>{{ post.excerpt | strip_html | truncate: 200 }}</p>
+    <a href="{{ post.url | prepend: site.baseurl }}" class="btn-read">続きを読む →</a>
+  </article>
+  {% endfor %}
+{% else %}
+  <div class="no-posts-message">
+    <p>現在、記事を準備中です。しばらくお待ちください。</p>
+  </div>
+{% endif %}
 
 {% include pagination.html root="blog" %}

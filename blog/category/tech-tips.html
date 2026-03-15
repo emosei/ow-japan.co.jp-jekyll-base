@@ -1,0 +1,42 @@
+---
+layout: default
+title: 技術Tips
+category_filter: tech-tips
+category_label: 技術Tips
+---
+
+<div class="container">
+  <div class="blog-layout">
+    <div class="blog-main">
+      <div class="category-hero">
+        <span class="section-label">Category</span>
+        <h1>技術Tips</h1>
+        <p>モバイルアプリ・Web開発の実践的なノウハウをお届けします。</p>
+        <a href="/blog" class="btn-back">← ブログ一覧に戻る</a>
+      </div>
+
+      {% assign filtered = site.posts | where_exp: "post", "post.categories contains 'tech-tips'" %}
+      {% if filtered.size > 0 %}
+        {% for post in filtered %}
+        <article class="post-card">
+          <div class="post-meta">
+            <time>{{ post.date | date: "%Y年%m月%d日" }}</time>
+            {% if post.author %}
+              <span class="post-meta-sep">·</span>
+              <span>{{ post.author }}</span>
+            {% endif %}
+          </div>
+          <h2><a href="{{ post.url | prepend: site.baseurl }}">{{ post.title }}</a></h2>
+          <p>{{ post.excerpt | strip_html | truncate: 200 }}</p>
+          <a href="{{ post.url | prepend: site.baseurl }}" class="btn-read">続きを読む →</a>
+        </article>
+        {% endfor %}
+      {% else %}
+        <p class="no-posts">このカテゴリの記事はまだありません。</p>
+      {% endif %}
+    </div>
+    <aside class="blog-sidebar">
+      {% include sidebar.html %}
+    </aside>
+  </div>
+</div>

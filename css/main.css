@@ -1001,6 +1001,7 @@ img { max-width: 100%; height: auto; }
     align-items: stretch;
     overflow-y: auto;
     border-top: 1px solid var(--border);
+    z-index: 999;
   }
   .nav-links.open li {
     border-bottom: 1px solid var(--border);

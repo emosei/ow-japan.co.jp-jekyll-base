@@ -23,7 +23,10 @@
 
 /* Reset */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html { scroll-behavior: smooth; }
+html {
+  scroll-behavior: smooth;
+  overflow-x: hidden;
+}
 body {
   background: var(--bg);
   color: var(--text);
@@ -31,6 +34,7 @@ body {
   font-size: 16px;
   line-height: 1.7;
   -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
 }
 h1, h2, h3, h4, h5, h6 {
   font-weight: 600;
@@ -121,10 +125,14 @@ img { max-width: 100%; height: auto; }
   background: none;
   border: none;
   cursor: pointer;
-  padding: 0.25rem;
+  padding: 0.5rem;
   color: var(--text);
   align-items: center;
   justify-content: center;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  z-index: 1001;
+  position: relative;
 }
 
 /* ===========================
@@ -994,7 +1002,10 @@ img { max-width: 100%; height: auto; }
     display: flex;
     flex-direction: column;
     position: fixed;
-    inset: 64px 0 0 0;
+    top: 64px;
+    left: 0;
+    right: 0;
+    bottom: 0;
     background: var(--bg);
     padding: 2rem 1.5rem;
     gap: 0;

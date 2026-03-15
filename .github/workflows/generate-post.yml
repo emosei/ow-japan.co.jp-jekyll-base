@@ -1,0 +1,50 @@
+name: Generate Blog Post
+
+on:
+  schedule:
+    # 毎週水曜日 午前9時 (JST = UTC+9 なので UTC 0時)
+    - cron: '0 0 * * 3'
+  workflow_dispatch:
+    # 手動実行も可能
+    inputs:
+      category:
+        description: '記事カテゴリ (tech-tips / it-trends / random)'
+        required: false
+        default: 'random'
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: pip install anthropic
+
+      - name: Generate blog post
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          CATEGORY: ${{ github.event.inputs.category || 'random' }}
+        run: python scripts/generate_post.py
+
+      - name: Commit and push
+        run: |
+          git config user.name "OpenWorks Bot"
+          git config user.email "bot@ow-japan.com"
+          git add _posts/
+          # 新しいファイルがあればコミット
+          if git diff --cached --quiet; then
+            echo "新しい記事なし"
+          else
+            git commit -m "📝 自動生成記事を追加 [$(date '+%Y-%m-%d')]"
+            git push
+          fi

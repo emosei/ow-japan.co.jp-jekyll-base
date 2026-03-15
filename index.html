@@ -1,332 +1,165 @@
 ---
 layout: default
-comments: true
 section_id: home
-slides:
-  - bg: images/@stock/slide-2.jpg
-    title:
-      text: For the life of worthy
-      animation: bottom-to-top
-      class: large-8 medium-11
-#    buttons:
-#      animation: bottom-to-top
-#      class: medium-12
-#      items:
-#        - text: Purchase Now
-#          url: http://themeforest.net/user/honryou/portfolio?ref=honryou
-#          class: boxed
-  - bg: images/@stock/slide-3.jpg
-    title:
-      text: For the life of worthy
-      animation: bottom-to-top
-      class: large-7 large-offset-5 medium-9 medium-offset-3
-#    buttons:
-#      animation: bottom-to-top
-#      class: large-7 large-offset-5 medium-9 medium-offset-3
-#      items:
-#        - text: Purchase Now
-#          url: http://themeforest.net/user/honryou/portfolio?ref=honryou
-#          class: boxed
-  - bg: images/@stock/slide-6.jpg
-    title:
-      text: For the life of worthy
-      animation: bottom-to-top
-      class: large-7 large-offset-5 medium-9 medium-offset-3
-#    buttons:
-#      animation: bottom-to-top slow
-#      class: large-12
-#      items:
-#        - text: View Features
-#          url: http://themeforest.net/user/honryou/portfolio?ref=honryou
-#          class: boxed
-#        - text: Purchase Now
-#          url: http://themeforest.net/user/honryou/portfolio?ref=honryou
-#    infos:
-#      - text: "&nbsp;Creative and responsive design"
-#        animation: bottom-to-top
-#      - text: "&nbsp;Many helpful shortcodes"
-#        animation: bottom-to-top
-#      - text: "&nbsp;Simple but powerful theme options"
-#        animation: bottom-to-top
-#      - text: "&nbsp;Fully responsive"
-#        animation: bottom-to-top
-boxes:
-  - icon_class: fa fa-trophy
-    title: Design
-    text:
-      Placeat vel itaque perspiciatis sed repellat qui nihil recusandae doloremque aperiam necessitatibus aspernatur. illum ad adipisci saepe dolores cumque fugit nihil minus. temporibus corporis eos dolore reprehenderit ipsa at neque ab ut porro perferendis ex nihilillum ad adipisci saepe dolores cumque fugit nihil minus.
-  - icon_class: fa fa-compass
-    title: Art direction
-    text:
-      Placeat vel itaque perspiciatis sed repellat qui nihil recusandae doloremque aperiam necessitatibus aspernatur. illum ad adipisci saepe dolores cumque fugit nihil minus. temporibus corporis eos dolore reprehenderit ipsa at neque ab ut porro perferendis ex nihilillum ad adipisci saepe dolores cumque fugit nihil minus.
-  - icon_class: fa fa-star-half-empty
-    title: Branding
-    text:
-      Placeat vel itaque perspiciatis sed repellat qui nihil recusandae doloremque aperiam necessitatibus aspernatur. illum ad adipisci saepe dolores cumque fugit nihil minus. temporibus corporis eos dolore reprehenderit ipsa at neque ab ut porro perferendis ex nihilillum ad adipisci saepe dolores cumque fugit nihil minus.
-  - icon_class: fa fa-image
-    title: Photography
-    text:
-      Placeat vel itaque perspiciatis sed repellat qui nihil recusandae doloremque aperiam necessitatibus aspernatur. illum ad adipisci saepe dolores cumque fugit nihil minus. temporibus corporis eos dolore reprehenderit ipsa at neque ab ut porro perferendis ex nihilillum ad adipisci saepe dolores cumque fugit nihil minus.
-  - icon_class: fa fa-dot-circle-o
-    title: Marketing
-    text:
-      Placeat vel itaque perspiciatis sed repellat qui nihil recusandae doloremque aperiam necessitatibus aspernatur. illum ad adipisci saepe dolores cumque fugit nihil minus. temporibus corporis eos dolore reprehenderit ipsa at neque ab ut porro perferendis ex nihilillum ad adipisci saepe dolores cumque fugit nihil minus.
-milestones:
-  - from: 0
-    to: 69
-    title: Projects Completed
-  - from: 0
-    to: 726
-    title: Cups of coffee offered
-  - from: 0
-    to: 59
-    title: Happy clients
-  - from: 0
-    to: 21
-    title: Articles Published
-
-#testimonials:
-#  - text: "Reprehenderit eos et non et ut eum reprehenderit quis sequi quia vel repellendus id. Velit quit blanditiis dolor quam error eos dolores sequi eaque rerum est. Velit quit blanditiis dolor quam error eos dolores sequi eaque rerum est."
-#    author: David White
-#    position: Designer at Huglab
-#  - text: "Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat consectetuer sit amet magna adipiscing."
-#    author: David White
-#    position: Designer at Huglab
-#  - text: "Reprehenderit eos et non et ut eum reprehenderit quis sequi quia vel repellendus id. Velit quit blanditiis dolor quam error eos dolores sequi eaque rerum est. Velit quit blanditiis dolor quam error eos dolores sequi eaque rerum est."
-#    author: David White
-#    position: Designer at Huglab
-
-clients:
-#  - images/@stock/client-1.png
-#  - images/@stock/client-2.png
-#  - images/@stock/client-3.png
-#  - images/@stock/client-4.png
-#  - images/@stock/client-5.png
-#  - images/@stock/client-6.png
-
 ---
 
-<div class='advanced mod modDefaultSlider'>
-  <div class='sequence' data-autostop='on' data-timeout='0'>
-    <a class='sequence-prev' href='javascript:void(0);'>
-      <span></span>
-    </a>
-    <a class='sequence-next' href='javascript:void(0);'>
-      <span></span>
-    </a>
-    <ul class='sequence-pagination'>
-      {% for slide in page.slides %}
-        {% if forloop.index == 1 %}
-          <li class='current'></li>
-        {% else %}
-          <li></li>
-        {% endif %}
-      {% endfor %}
-    </ul>
-    <ul class='sequence-canvas'>
-      {% for slide in page.slides %}
-        {% if forloop.index == 1 %}
-          {% assign class = "static" %}
-        {% else %}
-          {% assign class = '' %}
-        {% endif %}
-
-        <li class='frame {{class}}'>
-          <div class='bg' style='background-image: url({{slide.bg}});'></div>
-          {% if slide.infos %}
-            {% for info in slide.infos %}
-              <div class='info{{forloop.index}} {{info.animation}}' style=''>
-                <div class='row'>
-                  <div class='medium-10 large-8 columns'>
-                    <p class='fa fa-check' style='color: #333;'>{{info.text}}</p>
-                    <div class='spacing'></div>
-                  </div>
-                </div>
-              </div>
-            {% endfor %}
-          {% else %}
-            <div class='title {{slide.title.animation}}' style='color: rgb(255, 255, 255);'>
-              <div class='row'>
-                <div class='{{slide.title.class}} columns'>
-                  <h2>{{slide.title.text}}</h2>
-                </div>
-              </div>
-            </div>
-          {% endif %}
-          <div class='buttons-wrapper {{slide.buttons.animation}}' style=''>
-            <div class='row'>
-              <div class='{{slide.buttons.class}} columns'>
-                <div class='two spacing'></div>
-                {% for button in slide.buttons.items %}
-                  <a target="_blank" class='button {{button.class}}' href='{{button.url}}'>{{button.text}}</a>
-                {% endfor %}
-              </div>
-            </div>
-          </div>
-        </li>
-      {% endfor %}
-    </ul>
-  </div>
-</div>
-<!--
-<div class='full'>
-  <div class='row'>
-    <div class='large-12 columns'>
-      <h4 style='color: #999'>OpenWorksは</h4>
-      <h2></h2>
-      <div class='spacing'></div>
-      <p>This is the text about your Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat consectetuer sit amet magna adipiscing. Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat consectetuer sit amet magna adipiscing.</p>
+<!-- Hero -->
+<section class="hero">
+  <div class="container">
+    <div class="hero-content">
+      <div class="hero-eyebrow">
+        <span>●</span> 有限会社 OpenWorks — Est. 2006
       </div>
-  </div>
-  <div class='three spacing'></div>
-</div>
-<div class='full' style='background: #f5f5f5'>
-  <div class='row'>
-    <div class='large-12 columns'>
-      <div class='mod modBoxedTextSlider'>
-        <div class='boxes'>
-          {% for box in page.boxes %}
-            <div class='box' style=''>
-              <i class='{{box.icon_class}}'></i>
-              <h4>{{box.title}}</h4>
-              <p>{{box.text}}</p>
-            </div>
-          {% endfor %}
-        </div>
-      </div>
-    </div>
-  </div>
-  <div class='four spacing'></div>
-</div>
-
-
-<div class='full'>
-  <div class='row'>
-    <div class='medium-6 columns'>
-      <img class="fadeinleft" width="500" height="340" alt="" src="images/@stock/macbook.png" />
-    </div>
-    <div class='medium-6 columns'>
-      <div class='spacing'></div>
-      <h4 style='color: #999'>We all love</h4>
-      <h2>Fully responsive</h2>
-      <div class='spacing'></div>
-      <p>This is the text about your Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat consectetuer sit amet magna adipiscing. Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat consectetuer sit amet magna adipiscing.</p>
-      <div class='spacing'></div>
-      <a class='button small' href='#'>Learn more</a>
-    </div>
-  </div>
-  <div class='four spacing'></div>
-  <div class='row'>
-    <div class='medium-6 columns'>
-      <div class='two spacing'></div>
-      <h4 style='color: #999'>Simple</h4>
-      <h2>Easy to use</h2>
-      <div class='spacing'></div>
-      <ul class='shortcode-list'>
-        <li>
-          <i class='fa fa-check'></i>
-          This is a check list item, htis is a check list item
-        </li>
-        <li>
-          <i class='fa fa-check'></i>
-          Lorem ipsum dolor sit amet, consectetuer adipiscing elit ipsum
-        </li>
-        <li>
-          <i class='fa fa-check'></i>
-          Sed diam nonummy nibh euismod tincidunt ut, lorem ipsum dolor sit amet
-        </li>
-        <li>
-          <i class='fa fa-check'></i>
-          Dolore magna aliquam erat volutpat consectetu amet magna adipiscing
-        </li>
-      </ul>
-      <div class='spacing'></div>
-      <a class='button small' href='#'>Learn more</a>
-    </div>
-    <div class='medium-6 columns'>
-      <img class="fadeinright" width="500" height="400" alt="" src="images/@stock/circle-1.png" />
-    </div>
-  </div>
-  <div class='four spacing'></div>
-</div>
-
-
-
-<div class='full parallax' style='background: #f5f5f5'>
-  <div class='row'>
-    {% for milestone in page.milestones %}
-      <div class='medium-3 large-3 columns right-border left-border'>
-        <div class='mod modMilestone no-icon'>
-          <strong data-from='{{milestone.from}}' data-to='{{milestone.to}}'>&nbsp;</strong>
-          <span>{{milestone.title}}</span>
-          <div class='spacing'></div>
-        </div>
-      </div>
-    {% endfor %}
-  </div>
-  <div class='four spacing'></div>
-</div>
-<div class='full no-padding' style='background: #444; color: #fff'>
-  <div class='two spacing'></div>
-  <div class='mod modCallToAction'>
-    <div class='row'>
-      <div class='medium-9 large-9 columns'>
-        <p>Like what you see here? Checkout this theme and start to build your site immediately.</p>
-      </div>
-      <div class='medium-3 large-3 columns'>
-        <a class='boxed button' href='http://themeforest.net/user/honryou/portfolio?ref=honryou'>Learn more</a>
-      </div>
-    </div>
-  </div>
-  <div class='spacing'></div>
-</div>
-<div class='full'>
-  <div class='row'>
-    <div class='large-12 columns'>
-      <p class='centered-text'>
-        <i class='fa fa-quote-left' style='color: #F9CE06; font-size: 36px;'></i>
+      <h1>
+        テクノロジーで、<br>
+        <span class="gradient">ビジネスを前進させる。</span>
+      </h1>
+      <p class="hero-desc">
+        システム開発・モバイルアプリ・WEBアプリケーションの開発と運用を通じて、
+        お客様のビジネス課題を技術で解決します。東京を拠点に2006年の設立以来、
+        多くのプロジェクトを手がけてきました。
       </p>
+      <div class="hero-services">
+        <span class="service-tag">システム開発/運用</span>
+        <span class="service-tag">モバイルアプリ開発</span>
+        <span class="service-tag">WEBアプリ開発</span>
+      </div>
+      <div class="hero-cta">
+        <a href="{{ site.baseurl }}/contact.html" class="btn btn-primary">お問い合わせ</a>
+        <a href="{{ site.baseurl }}/about.html" class="btn btn-secondary">会社概要を見る →</a>
+      </div>
     </div>
   </div>
-  <div class='row'>
-    <div class='large-12 columns'>
-      <div class='mod modTestimonials'>
-        <div class='row'>
-          <div class='small-12 columns'>
-            <div class='items centered-text'>
-              {% for t in page.testimonials  %}
-                <div class='item'>
-                  <p class='quote'>{{t.text}}</p>
-                  <p class='author'>- {{t.author}}, {{t.position}}</p>
-                  <div class='two spacing'></div>
-                </div>
-              {% endfor %}
-            </div>
-          </div>
-          <div class='spacing'></div>
+</section>
+
+<!-- Services -->
+<section class="section section-alt">
+  <div class="container">
+    <div class="section-header">
+      <span class="section-label">Services</span>
+      <h2>提供サービス</h2>
+      <p>お客様のニーズに合わせた、高品質なシステム開発サービスを提供します。</p>
+    </div>
+    <div class="cards-grid">
+      <div class="card reveal">
+        <div class="card-icon">💻</div>
+        <h3>システム開発/運用</h3>
+        <p>業務システムの設計・開発から運用・保守まで、ワンストップでサポートします。お客様の業務効率化と生産性向上を実現します。</p>
+        <ul class="card-list">
+          <li>要件定義・設計</li>
+          <li>開発・テスト</li>
+          <li>運用・保守</li>
+        </ul>
+      </div>
+      <div class="card reveal" style="transition-delay:0.1s">
+        <div class="card-icon">📱</div>
+        <h3>モバイルアプリ開発</h3>
+        <p>iOS・Androidに対応したネイティブアプリの開発を行います。ユーザビリティを重視した直感的なインターフェースを設計します。</p>
+        <ul class="card-list">
+          <li>iOS / Android 対応</li>
+          <li>UI/UX 設計</li>
+          <li>リリース後サポート</li>
+        </ul>
+      </div>
+      <div class="card reveal" style="transition-delay:0.2s">
+        <div class="card-icon">🌐</div>
+        <h3>WEBアプリ開発</h3>
+        <p>モダンな技術スタックを活用したWEBアプリケーションの開発を行います。スケーラブルで保守性の高いシステムを構築します。</p>
+        <ul class="card-list">
+          <li>フロントエンド開発</li>
+          <li>バックエンド開発</li>
+          <li>クラウド構築・運用</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Features / Why OpenWorks -->
+<section class="section">
+  <div class="container">
+    <div class="section-header">
+      <span class="section-label">Why OpenWorks</span>
+      <h2>選ばれる理由</h2>
+      <p>お客様に信頼され続けるための、私たちのこだわりです。</p>
+    </div>
+    <div class="features-grid">
+      <div class="feature-item reveal">
+        <div class="feature-icon">⚡</div>
+        <div>
+          <h4>迅速な対応</h4>
+          <p>お客様からのご要望・お問い合わせに素早く対応します。スピードを重視したプロジェクト推進で、ビジネスチャンスを逃しません。</p>
+        </div>
+      </div>
+      <div class="feature-item reveal" style="transition-delay:0.1s">
+        <div class="feature-icon">🔒</div>
+        <div>
+          <h4>高い品質と安全性</h4>
+          <p>徹底したテストと品質管理により、安定したシステムを提供します。セキュリティへの配慮も欠かしません。</p>
+        </div>
+      </div>
+      <div class="feature-item reveal" style="transition-delay:0.2s">
+        <div class="feature-icon">🤝</div>
+        <div>
+          <h4>長期的なパートナーシップ</h4>
+          <p>納品後も継続的な運用・保守でお客様をサポートします。2006年の創業以来、長期的な関係を大切にしています。</p>
+        </div>
+      </div>
+      <div class="feature-item reveal" style="transition-delay:0.3s">
+        <div class="feature-icon">💡</div>
+        <div>
+          <h4>最新技術の活用</h4>
+          <p>常に最新の技術動向を追いかけ、お客様のビジネスに最適なソリューションをご提案します。</p>
         </div>
       </div>
     </div>
   </div>
-  <div class='four spacing'></div>
-</div>
--->
+</section>
 
-<div class='full parallax' style='background-image: url(../images/@stock/customers-bg.jpg); color: #fff;'>
-  <div class='row'>
-    <div class='large-12 columns'>
-      <div class='mod modClients' data-slides_to_show='4'>
-        <div class='clients'>
-          {% for client in page.clients %}
-            <div><img alt="" src="{{client}}" /></div>
-          {% endfor %}
+<!-- Blog preview -->
+{% if site.posts.size > 0 %}
+<section class="section">
+  <div class="container">
+    <div class="section-header">
+      <span class="section-label">Blog</span>
+      <h2>最新記事</h2>
+      <p>技術情報やお知らせをお届けします。</p>
+    </div>
+    <div class="blog-preview-grid">
+      {% for post in site.posts limit:3 %}
+      <article class="blog-preview-card reveal" style="transition-delay:{{ forloop.index0 | times: 100 }}ms">
+        <div class="blog-preview-meta">
+          <time>{{ post.date | date: "%Y年%m月%d日" }}</time>
+          {% if post.categories.size > 0 %}
+            <span class="blog-preview-cat">{{ post.categories | first }}</span>
+          {% endif %}
+        </div>
+        <h3><a href="{{ post.url | prepend: site.baseurl }}">{{ post.title }}</a></h3>
+        <p>{{ post.excerpt | strip_html | truncate: 120 }}</p>
+        <a href="{{ post.url | prepend: site.baseurl }}" class="btn-read">続きを読む →</a>
+      </article>
+      {% endfor %}
+    </div>
+    <div style="text-align:center; margin-top:3rem">
+      <a href="{{ site.baseurl }}/blog/" class="btn btn-secondary">すべての記事を見る</a>
+    </div>
+  </div>
+</section>
+{% endif %}
+
+<!-- CTA -->
+<section class="cta-section">
+  <div class="container">
+    <div class="cta-inner">
+      <h2>プロジェクトのご相談はお気軽に</h2>
+      <p>まずはお気軽にお問い合わせください。詳しい内容をヒアリングした上で、最適なご提案をいたします。</p>
+      <div class="cta-actions">
+        <a href="{{ site.baseurl }}/contact.html" class="btn btn-primary">お問い合わせ</a>
+        <div class="cta-contact-info">
+          <span>📞 (080) 3359 7760</span>
+          <span>✉️ sei.emoto@ow-japan.com</span>
         </div>
       </div>
     </div>
   </div>
-  <div class='two spacing'></div>
-</div>
-
-
-
-
+</section>

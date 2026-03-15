@@ -147,16 +147,21 @@ def main():
     if not api_key:
         raise RuntimeError("ANTHROPIC_API_KEY が設定されていません")
 
-    # カテゴリ選択
-    category_key = os.environ.get("CATEGORY", "random").lower()
-    if category_key not in CATEGORIES:
-        category_key = random.choice(list(CATEGORIES.keys()))
-
-    config = CATEGORIES[category_key]
-    topic = random.choice(config["topics"])
-
-    print(f"カテゴリ: {config['category_ja']}")
-    print(f"テーマ: {topic}")
+    # 自由テーマが指定されていればそれを使う
+    free_topic = os.environ.get("TOPIC", "").strip()
+    if free_topic:
+        topic = free_topic
+        config = {"category": "tech-tips", "category_ja": "技術Tips"}
+        print(f"自由テーマ: {topic}")
+    else:
+        # カテゴリから自動選択
+        category_key = os.environ.get("CATEGORY", "random").lower()
+        if category_key not in CATEGORIES:
+            category_key = random.choice(list(CATEGORIES.keys()))
+        config = CATEGORIES[category_key]
+        topic = random.choice(config["topics"])
+        print(f"カテゴリ: {config['category_ja']}")
+        print(f"テーマ: {topic}")
 
     # Claude API で記事生成
     client = anthropic.Anthropic(api_key=api_key)

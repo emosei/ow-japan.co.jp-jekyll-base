@@ -5,12 +5,15 @@ on:
     # 毎週水曜日 午前9時 (JST = UTC+9 なので UTC 0時)
     - cron: '0 0 * * 3'
   workflow_dispatch:
-    # 手動実行も可能
     inputs:
       category:
-        description: '記事カテゴリ (tech-tips / it-trends / random)'
+        description: 'カテゴリ (tech-tips / it-trends / random)'
         required: false
         default: 'random'
+      topic:
+        description: '自由テーマ（例: Swiftの最新機能、Docker入門 など）空欄ならカテゴリから自動選択'
+        required: false
+        default: ''
 
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
@@ -37,6 +40,7 @@ jobs:
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           CATEGORY: ${{ github.event.inputs.category || 'random' }}
+          TOPIC: ${{ github.event.inputs.topic || '' }}
         run: python scripts/generate_post.py
 
       - name: Commit and push

@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
     inputs:
       category:
-        description: 'カテゴリ (tech-tips / it-trends / random)'
+        description: 'カテゴリ (tech-tips / it-trends / tech-verification / random)'
         required: false
         default: 'random'
       topic:

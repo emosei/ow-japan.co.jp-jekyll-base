@@ -39,6 +39,24 @@ TECH_TIPS = [
     "API認証の選択肢：JWT・OAuth2・セッション管理を整理する",
 ]
 
+TECH_VERIFICATION = [
+    "SwiftUIで簡単なToDoアプリを作ってみた",
+    "Flutter 3.xの新機能を実際に試してみた",
+    "React Native ExpoとBare Workflowを比較検証",
+    "Next.js 15のTurbopackを本番環境で試した結果",
+    "GitHub Copilotは実際に開発速度を上げるのか検証してみた",
+    "Supabaseをバックエンドとして使ってみた感想",
+    "PrismaとDrizzle ORMを実プロジェクトで比較",
+    "Docker Composeで本番に近い開発環境を構築する",
+    "Cloudflare WorkersでAPIを作って速度検証",
+    "Vitestに移行して感じたJestとの違い",
+    "SQLiteをモバイルアプリのローカルDBとして使う実装例",
+    "Jetpack ComposeでカスタムUIコンポーネントを作ってみた",
+    "XcodeのInstrumentsでiOSアプリのメモリリークを発見する手順",
+    "PlaywrightでE2Eテストを書いてみた",
+    "GitHub Actionsで自動デプロイ環境を整備した話",
+]
+
 IT_TRENDS = [
     "2024年注目のフロントエンドフレームワーク動向まとめ",
     "生成AIをアプリ開発に組み込む：実践的なアプローチ",
@@ -67,6 +85,11 @@ CATEGORIES = {
         "topics": IT_TRENDS,
         "category": "it-trends",
         "category_ja": "ITトレンド",
+    },
+    "tech-verification": {
+        "topics": TECH_VERIFICATION,
+        "category": "tech-verification",
+        "category_ja": "技術検証",
     },
 }
 
@@ -149,9 +172,14 @@ def main():
 
     # 自由テーマが指定されていればそれを使う
     free_topic = os.environ.get("TOPIC", "").strip()
+    category_key = os.environ.get("CATEGORY", "random").lower()
     if free_topic:
         topic = free_topic
-        config = {"category": "tech-tips", "category_ja": "技術Tips"}
+        # 自由テーマでもカテゴリ指定があればそれを使う
+        if category_key in CATEGORIES:
+            config = CATEGORIES[category_key]
+        else:
+            config = CATEGORIES["tech-verification"]
         print(f"自由テーマ: {topic}")
     else:
         # カテゴリから自動選択

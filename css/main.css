@@ -23,10 +23,7 @@
 
 /* Reset */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html {
-  scroll-behavior: smooth;
-  overflow-x: hidden;
-}
+html { scroll-behavior: smooth; }
 body {
   background: var(--bg);
   color: var(--text);
@@ -34,7 +31,6 @@ body {
   font-size: 16px;
   line-height: 1.7;
   -webkit-font-smoothing: antialiased;
-  overflow-x: hidden;
 }
 h1, h2, h3, h4, h5, h6 {
   font-weight: 600;
@@ -459,6 +455,11 @@ img { max-width: 100%; height: auto; }
   gap: 3rem;
   align-items: start;
   padding: 8rem 0 6rem;
+  min-width: 0;
+}
+.blog-main {
+  min-width: 0;
+  overflow: hidden;
 }
 .post-card {
   background: var(--bg-secondary);
@@ -674,6 +675,19 @@ img { max-width: 100%; height: auto; }
 .post-full-content {
   line-height: 1.85;
   font-size: 0.95rem;
+  overflow-wrap: break-word;
+  word-break: break-word;
+  min-width: 0;
+}
+.post-full-content img,
+.post-full-content table,
+.post-full-content iframe {
+  max-width: 100%;
+}
+.post-full-content table {
+  display: block;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 .post-full-content h2 {
   font-size: 1.35rem;

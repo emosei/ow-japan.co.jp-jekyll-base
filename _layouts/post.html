@@ -2,60 +2,36 @@
 layout: blog
 ---
 
-
-<div class='mod modBlogPost big no_bg'>
-  <div class='images'>
-    {% for image in page.images %}
-      <div class='image'><img alt="" src="{{site.url}}/{{image}}" /></div>
-    {% endfor %}
-  </div>
-  <div class='content'>
-    <p class='info'>
-      <span>{{page.date | date: "%B %d, %Y" }}</span>
-      /
-      <span>
-        by
-        <a href="">{{page.author}}</a>
-      </span>
-      /
-      <span>
-        In
+<article class="post-full">
+  <header class="post-full-header">
+    <div class="post-meta">
+      <time>{{ page.date | date: "%Y年%m月%d日" }}</time>
+      {% if page.author %}
+        <span class="post-meta-sep">·</span>
+        <span>{{ page.author }}</span>
+      {% endif %}
+      {% if page.categories.size > 0 %}
+        <span class="post-meta-sep">·</span>
         {% for cat in page.categories %}
-          <a href="#">{{cat}}</a>
-          {% unless forloop.last %}
-              ,
-          {% endunless %}
+          <span class="blog-preview-cat">{{ cat }}</span>
         {% endfor %}
-      </span>
-      /
-      <span>
-        <a href="#">4 commetns</a>
-      </span>
-    </p>
-    <h3><a href="{{page.url}}">{{page.title}}</a></h3>
-    {{content}}
+      {% endif %}
+    </div>
+    <h1 class="post-full-title">{{ page.title }}</h1>
+    {% if page.tags.size > 0 %}
+    <div class="post-tags">
+      {% for tag in page.tags %}
+        <span class="post-tag">{{ tag }}</span>
+      {% endfor %}
+    </div>
+    {% endif %}
+  </header>
+
+  <div class="post-full-content">
+    {{ content }}
   </div>
-</div>
-<div class='two spacing'></div>
 
-<div id="disqus_thread"></div>
-<script>
-
-/**
-*  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
-*  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables*/
-/*
-var disqus_config = function () {
-this.page.url = PAGE_URL;  // Replace PAGE_URL with your page's canonical URL variable
-this.page.identifier = PAGE_IDENTIFIER; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
-};
-*/
-(function() { // DON'T EDIT BELOW THIS LINE
-var d = document, s = d.createElement('script');
-s.src = 'https://website-openworks.disqus.com/embed.js';
-s.setAttribute('data-timestamp', +new Date());
-(d.head || d.body).appendChild(s);
-})();
-</script>
-<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
-
+  <footer class="post-full-footer">
+    <a href="{{ site.baseurl }}/blog/" class="btn btn-secondary">← ブログ一覧に戻る</a>
+  </footer>
+</article>

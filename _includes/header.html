@@ -1,45 +1,28 @@
-<a href="" id="top"></a>
-<div class='contain-to-grid sticky'>
-  <nav class='top-bar' data-options='sticky_on: large' data-topbar=''>
-    <ul class='title-area'>
-      <li class='name'>
-        <h1>
-          <a href="{{site.url}}/index.html">
-            <img alt="" src="{{site.url}}/images/logo-header.png" />
-          </a>
-        </h1>
-      </li>
-      <li class='toggle-topbar menu-icon'>
-        <a href='#'>Menu</a>
-      </li>
-    </ul>
-    <section class='top-bar-section'>
-      <ul class="right">
+<header class="site-header" id="site-header">
+  <div class="container">
+    <nav class="nav-inner">
+      <a href="{{ site.baseurl }}/" class="nav-logo">
+        <img src="{{ site.baseurl }}/images/logo-header.png" alt="OpenWorks" class="nav-logo-img">
+      </a>
+      <ul class="nav-links" id="nav-links">
         {% for item in site.data.nav %}
           {% if item.section_id == page.section_id %}
             {% assign active_class = "active" %}
           {% else %}
             {% assign active_class = "" %}
           {% endif %}
-
-          {% if item.children %}
-            <li class="has-dropdown {{active_class}}">
-              <a href="{{site.url}}/{{ item.path }}">{{ item.name }}</a>
-              <ul class='dropdown'>
-                {% for child in item.children %}
-                  <li>
-                    <a href="{{site.url}}/{{ child.path }}">{{ child.name }}</a>
-                  </li>
-                {% endfor %}
-              </ul>
-            </li>
-          {% else %}
-            <li class="{{active_class}}">
-              <a href="{{site.url}}/{{ item.path }}">{{ item.name }}</a>
-            </li>
-          {% endif %}
+          <li>
+            <a href="{{ site.baseurl }}/{{ item.path }}" class="{{ active_class }}">{{ item.name }}</a>
+          </li>
         {% endfor %}
       </ul>
-    </section>
-  </nav>
-</div>
+      <button class="nav-toggle" aria-label="メニュー" aria-expanded="false" id="nav-toggle">
+        <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <line x1="2" y1="6" x2="20" y2="6"/>
+          <line x1="2" y1="11" x2="20" y2="11"/>
+          <line x1="2" y1="16" x2="20" y2="16"/>
+        </svg>
+      </button>
+    </nav>
+  </div>
+</header>

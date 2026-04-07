@@ -3,116 +3,515 @@ OpenWorks ブログ記事自動生成スクリプト
 Claude API を使って技術記事を生成し、Jekyll の _posts/ に保存する
 """
 
-import anthropic
+from __future__ import annotations
+
 import datetime
+import json
 import os
 import random
 import re
 import unicodedata
+from pathlib import Path
+
+import anthropic
 
 
-# ── テーマ定義 ──────────────────────────────────────────────
+# ── カテゴリごとの発想キーワード ────────────────────────────
 
 TECH_TIPS = [
-    # モバイルアプリ開発
-    "React Native と Flutter の最新比較：2024年はどちらを選ぶべきか",
-    "iOSアプリのパフォーマンス改善で押さえておくべき5つのポイント",
-    "Androidアプリ開発でよくある落とし穴と回避策",
-    "モバイルアプリのオフライン対応設計パターン",
-    "プッシュ通知の設計：ユーザー体験を損なわない実装方法",
-    "モバイルアプリのCI/CD環境を整備する：Fastlane入門",
-    "SwiftUI vs UIKit：既存プロジェクトへの段階的な移行戦略",
-    "Jetpack Composeで変わるAndroid UI開発の現場",
-    # Web開発
-    "Next.js App Router 移行で学んだこと",
-    "TypeScriptの型安全を最大限に活用するためのテクニック集",
-    "Webアプリのパフォーマンス計測と改善：Core Web Vitals実践ガイド",
-    "バックエンドAPI設計のベストプラクティス：REST vs GraphQL vs tRPC",
-    "Docker Composeで整える快適なローカル開発環境",
-    "フロントエンドテスト戦略：何をどこまでテストするか",
-    "SQLクエリのパフォーマンスチューニング入門",
-    "WebSocketとServer-Sent Eventsの使い分け",
-    # システム開発共通
-    "コードレビューを文化として根付かせるための取り組み",
-    "小規模チームでも実践できるアジャイル開発のエッセンス",
-    "技術的負債と向き合う：リファクタリング計画の立て方",
-    "API認証の選択肢：JWT・OAuth2・セッション管理を整理する",
+    "モバイル開発",
+    "Ruby",
+    "基幹システム",
+    "アジャイル",
+    "アーキテクチャ",
 ]
 
 TECH_VERIFICATION = [
-    "SwiftUIで簡単なToDoアプリを作ってみた",
-    "Flutter 3.xの新機能を実際に試してみた",
-    "React Native ExpoとBare Workflowを比較検証",
-    "Next.js 15のTurbopackを本番環境で試した結果",
-    "GitHub Copilotは実際に開発速度を上げるのか検証してみた",
-    "Supabaseをバックエンドとして使ってみた感想",
-    "PrismaとDrizzle ORMを実プロジェクトで比較",
-    "Docker Composeで本番に近い開発環境を構築する",
-    "Cloudflare WorkersでAPIを作って速度検証",
-    "Vitestに移行して感じたJestとの違い",
-    "SQLiteをモバイルアプリのローカルDBとして使う実装例",
-    "Jetpack ComposeでカスタムUIコンポーネントを作ってみた",
-    "XcodeのInstrumentsでiOSアプリのメモリリークを発見する手順",
-    "PlaywrightでE2Eテストを書いてみた",
-    "GitHub Actionsで自動デプロイ環境を整備した話",
+    "関数型言語",
+    "Ruby",
+    "Haskell",
+    "Rust",
+    "Go",
+    "JavaScript",
+    "認証",
+    "Webサーバー",
+    "Webアプリミドルウェア",
 ]
 
-IT_TRENDS = [
-    "2024年注目のフロントエンドフレームワーク動向まとめ",
-    "生成AIをアプリ開発に組み込む：実践的なアプローチ",
-    "エッジコンピューティングがWebアプリ開発に与える影響",
-    "WebAssemblyの現在地：どんなユースケースで使うべきか",
-    "クラウドネイティブ開発の最新トレンド：KubernetesとServerlessの進化",
-    "ローコード・ノーコードツールとプロ開発者の共存",
-    "サイバーセキュリティの最新脅威と中小企業が取るべき対策",
-    "開発者体験（DX）向上が注目される背景とツール動向",
-    "AIコーディングアシスタントの現実：GitHub Copilotを使って感じたこと",
-    "マイクロサービスとモノリス：2024年の現実的な選択",
-    "Progressive Web Appの再評価：ネイティブアプリとの棲み分け",
-    "SQLiteのルネッサンス：サーバーレスとエッジでの活躍",
-    "プラットフォームエンジニアリングとは何か：DevOpsの次のステップ",
-    "Rustがシステム開発にもたらす変化",
-    "量子コンピューティングがソフトウェア開発者に関係する理由",
-]
+IT_TRENDS: list[str] = []
 
 CATEGORIES = {
     "tech-tips": {
-        "topics": TECH_TIPS,
+        "keywords": TECH_TIPS,
         "category": "tech-tips",
         "category_ja": "技術Tips",
+        "topic_guidance": "実務で使える設計・改善・運用ノウハウに寄せる",
+        "focus_keyword_count": 1,
     },
     "it-trends": {
-        "topics": IT_TRENDS,
+        "keywords": IT_TRENDS,
         "category": "it-trends",
         "category_ja": "ITトレンド",
+        "topic_guidance": "開発現場や事業運営に影響する変化を、実務目線で整理する",
+        "focus_keyword_count": 0,
     },
     "tech-verification": {
-        "topics": TECH_VERIFICATION,
+        "keywords": TECH_VERIFICATION,
         "category": "tech-verification",
         "category_ja": "技術検証",
+        "topic_guidance": "試す・比較する・検証する切り口で、再現性のあるテーマに寄せる",
+        "focus_keyword_count": 1,
+    },
+}
+
+POSTS_DIR = Path("_posts")
+MAX_RELATED_POSTS = 3
+MAX_RECENT_POST_CONTEXT = 20
+MAX_GENERATION_ATTEMPTS = 2
+TOPIC_CANDIDATE_COUNT = 10
+TOPIC_SELECTION_POOL = 4
+TOPIC_DUPLICATE_THRESHOLD = 0.72
+TITLE_DUPLICATE_THRESHOLD = 0.86
+BODY_DUPLICATE_THRESHOLD = 0.82
+MODEL_NAME = "claude-haiku-4-5-20251001"
+
+PROMPT_PROFILES = {
+    "tech-tips": {
+        "length": "2200〜3200字程度",
+        "sections": "4〜6個",
+        "must_cover": [
+            "現場でそのテーマが問題になる背景と、見落とされやすい課題",
+            "設計や技術選定で判断すべきポイントとトレードオフ",
+            "実装・設定・運用の具体例を1つ以上。コードや設定値は省略しすぎない",
+            "導入時や運用時にハマりやすい落とし穴と回避策",
+            "小規模チームでも始めやすい現実的な導入ステップ",
+        ],
+        "extra_rules": [
+            "抽象論で終わらせず、読者が実務でそのまま判断材料に使える密度で書く",
+            "必要に応じてコードブロックや設定ファイル例を入れる",
+            "『どう使うか』だけでなく『どういう条件では向かないか』も書く",
+        ],
+    },
+    "tech-verification": {
+        "length": "2400〜3400字程度",
+        "sections": "4〜6個",
+        "must_cover": [
+            "検証の目的、前提条件、比較観点",
+            "検証手順や構成を再現できるレベルの具体性",
+            "試して分かった利点・制約・注意点",
+            "実務投入するなら追加で確認すべきポイント",
+            "誰に向いているか、どんな案件で採用しやすいか",
+        ],
+        "extra_rules": [
+            "感想だけで終わらせず、検証の観点と結果を切り分けて書く",
+            "実験条件やサンプル構成が想像できる程度に具体化する",
+            "コード例・設定例・コマンド例のうち最低1つは含める",
+        ],
+    },
+    "it-trends": {
+        "length": "1800〜2600字程度",
+        "sections": "3〜5個",
+        "must_cover": [
+            "トレンドが注目される背景",
+            "開発現場への具体的な影響",
+            "導入が向くケースと向かないケース",
+            "中小規模の開発組織が現実的に取れるアクション",
+        ],
+        "extra_rules": [
+            "流行の紹介だけで終わらせず、実務での含意まで落とし込む",
+            "過度に煽らず、現実的なメリットと制約を併記する",
+        ],
     },
 }
 
 
+# ── 類似度計算と既存記事読み込み ────────────────────────────
+
+def normalize_text(text: str) -> str:
+    text = unicodedata.normalize("NFKC", text).lower()
+    text = re.sub(r"https?://\S+", " ", text)
+    text = re.sub(r"[^\wぁ-んァ-ヶ一-龠ー]+", " ", text)
+    return re.sub(r"\s+", " ", text).strip()
+
+
+def char_ngrams(text: str, n: int = 2) -> set[str]:
+    compact = normalize_text(text).replace(" ", "")
+    if not compact:
+        return set()
+    if len(compact) <= n:
+        return {compact}
+    return {compact[index : index + n] for index in range(len(compact) - n + 1)}
+
+
+def jaccard_similarity(left: set[str], right: set[str]) -> float:
+    if not left or not right:
+        return 0.0
+    union = left | right
+    if not union:
+        return 0.0
+    return len(left & right) / len(union)
+
+
+def text_similarity(left: str, right: str, n: int = 2) -> float:
+    left_normalized = normalize_text(left)
+    right_normalized = normalize_text(right)
+    if not left_normalized or not right_normalized:
+        return 0.0
+    if left_normalized == right_normalized:
+        return 1.0
+
+    score = jaccard_similarity(char_ngrams(left_normalized, n=n), char_ngrams(right_normalized, n=n))
+    if len(left_normalized) >= 6 and len(right_normalized) >= 6:
+        if left_normalized in right_normalized or right_normalized in left_normalized:
+            score = max(score, 0.88)
+    return score
+
+
+def parse_tags(raw_tags: str) -> list[str]:
+    if not raw_tags:
+        return []
+
+    quoted_tags = re.findall(r'"([^"]+)"', raw_tags)
+    if quoted_tags:
+        return quoted_tags
+
+    cleaned = raw_tags.strip().strip("[]")
+    if not cleaned:
+        return []
+
+    return [tag.strip().strip('"').strip("'") for tag in cleaned.split(",") if tag.strip()]
+
+
+def parse_frontmatter(content: str) -> tuple[dict[str, str], str]:
+    lines = content.splitlines()
+    if not lines or lines[0].strip() != "---":
+        return {}, content
+
+    metadata: dict[str, str] = {}
+    body_start = 0
+    for index, line in enumerate(lines[1:], start=1):
+        if line.strip() == "---":
+            body_start = index + 1
+            break
+        if ":" not in line:
+            continue
+        key, value = line.split(":", 1)
+        metadata[key.strip()] = value.strip()
+
+    body = "\n".join(lines[body_start:]).strip()
+    return metadata, body
+
+
+def load_existing_posts() -> list[dict[str, object]]:
+    posts: list[dict[str, object]] = []
+    if not POSTS_DIR.exists():
+        return posts
+
+    for path in sorted(POSTS_DIR.glob("*.md")):
+        content = path.read_text(encoding="utf-8")
+        metadata, body = parse_frontmatter(content)
+        posts.append(
+            {
+                "path": path,
+                "title": metadata.get("title", "").strip().strip('"'),
+                "category": metadata.get("categories", "").strip(),
+                "date": metadata.get("date", "").strip() or path.stem[:10],
+                "tags": parse_tags(metadata.get("tags", "")),
+                "body": body,
+            }
+        )
+
+    return posts
+
+
+def sort_posts_by_recency(existing_posts: list[dict[str, object]]) -> list[dict[str, object]]:
+    return sorted(existing_posts, key=lambda post: str(post["date"]), reverse=True)
+
+
+def find_related_posts(topic: str, existing_posts: list[dict[str, object]], limit: int = MAX_RELATED_POSTS) -> list[dict[str, object]]:
+    related_posts: list[dict[str, object]] = []
+    for post in existing_posts:
+        title_score = text_similarity(topic, str(post["title"]))
+        tag_score = max((text_similarity(topic, tag) for tag in post["tags"]), default=0.0)
+        score = max(title_score, tag_score)
+        if score <= 0:
+            continue
+        related_posts.append(
+            {
+                "post": post,
+                "score": score,
+                "title_score": title_score,
+                "tag_score": tag_score,
+            }
+        )
+
+    related_posts.sort(key=lambda item: item["score"], reverse=True)
+    return related_posts[:limit]
+
+
+def choose_topic(topic_candidates: list[str], existing_posts: list[dict[str, object]]) -> tuple[str, list[dict[str, object]]]:
+    if not topic_candidates:
+        raise RuntimeError("テーマ候補を生成できませんでした")
+
+    ranked_candidates: list[tuple[float, float, str, list[dict[str, object]]]] = []
+    for topic in topic_candidates:
+        related_posts = find_related_posts(topic, existing_posts)
+        strongest_match = related_posts[0]["score"] if related_posts else 0.0
+        total_overlap = sum(item["score"] for item in related_posts)
+        ranked_candidates.append((strongest_match, total_overlap, topic, related_posts))
+
+    ranked_candidates.sort(key=lambda item: (item[0], item[1]))
+    fresh_candidates = [item for item in ranked_candidates if item[0] < TOPIC_DUPLICATE_THRESHOLD]
+    selection_pool = fresh_candidates or ranked_candidates
+    selection_width = min(TOPIC_SELECTION_POOL, len(selection_pool))
+    strongest_match, _, topic, related_posts = random.choice(selection_pool[:selection_width])
+
+    if strongest_match >= TOPIC_DUPLICATE_THRESHOLD:
+        print("⚠️ 近いテーマが多いため、既存記事との差分を意識して生成します")
+
+    return topic, related_posts
+
+
+def format_related_posts(related_posts: list[dict[str, object]]) -> str:
+    if not related_posts:
+        return "- 関連する過去記事は見つかりませんでした"
+
+    lines = []
+    for item in related_posts[:MAX_RELATED_POSTS]:
+        post = item["post"]
+        tags = ", ".join(post["tags"][:4]) if post["tags"] else "タグなし"
+        lines.append(
+            f"- 「{post['title']}」 ({post['date']} / {post['category']} / タグ: {tags})"
+        )
+    return "\n".join(lines)
+
+
+def format_recent_posts(existing_posts: list[dict[str, object]], limit: int = MAX_RECENT_POST_CONTEXT) -> str:
+    recent_posts = sort_posts_by_recency(existing_posts)[:limit]
+    if not recent_posts:
+        return "- 過去記事はまだありません"
+
+    lines = []
+    for post in recent_posts:
+        lines.append(f"- {post['date']}: 「{post['title']}」 ({post['category']})")
+    return "\n".join(lines)
+
+
+def render_similarity_hint(related_posts: list[dict[str, object]]) -> str:
+    if not related_posts:
+        return "なし"
+    return " / ".join(f"「{item['post']['title']}」" for item in related_posts)
+
+
+def choose_focus_keywords(keywords: list[str], count: int) -> list[str]:
+    if not keywords or count <= 0:
+        return []
+    if len(keywords) <= count:
+        return keywords[:]
+    return random.sample(keywords, count)
+
+
+# ── テーマ候補生成 ────────────────────────────────────────
+
+def build_topic_ideation_prompt(
+    category_key: str,
+    category_ja: str,
+    topic_guidance: str,
+    category_keywords: list[str],
+    focus_keywords: list[str],
+    existing_posts: list[dict[str, object]],
+) -> str:
+    current_year = datetime.date.today().year
+    keyword_pool = " / ".join(category_keywords) if category_keywords else "特になし"
+    focus_text = " / ".join(focus_keywords) if focus_keywords else "特になし"
+
+    if focus_keywords:
+        keyword_rules = f"""
+【今回の発想キーワード】
+- カテゴリ全体のキーワード: {keyword_pool}
+- 今回は特に「{focus_text}」を軸に考える
+- ただしキーワードをそのままタイトルに置くだけでなく、具体的な課題や判断ポイントに落とし込む
+"""
+    else:
+        keyword_rules = """
+【今回の発想キーワード】
+- 特定のキーワードは設けない
+- 受託開発や自社サービス開発の現場で、実務に影響するITトレンドを優先する
+"""
+
+    return f"""あなたはシステム開発会社「有限会社OpenWorks」の編集者です。
+テックブログ用に、新しい記事テーマ案だけを考えてください。
+
+カテゴリ: {category_ja}
+カテゴリの方向性: {topic_guidance}
+
+【最近の投稿】
+{format_recent_posts(existing_posts)}
+
+{keyword_rules}
+
+【テーマ案の条件】
+- 日本語の具体的な記事タイトルとして成立すること
+- 過去記事と同じ主題や、ほぼ同じ切り口を避けること
+- 似た案を並べず、観点をばらけさせること
+- 古い年号に依存しないこと。年号を入れるなら {current_year} 年以外を使わない
+- 「最新まとめ」「入門」だけの抽象的なタイトルは避ける
+- 実務で深掘りしやすい、論点のあるタイトルにする
+- カテゴリの性格を守ること
+  - tech-tips: 実務ノウハウや設計・改善の勘所
+  - tech-verification: 何かを試す、比較する、検証する
+  - it-trends: 変化の背景と実務への影響
+
+{TOPIC_CANDIDATE_COUNT}個の候補を出してください。
+
+【出力形式】
+JSON配列のみを返してください。
+例:
+["候補1", "候補2"]
+"""
+
+
+def clean_topic_candidate(candidate: str) -> str:
+    cleaned = str(candidate).strip()
+    cleaned = re.sub(r"^\s*(?:[-*]|\d+[.)、])\s*", "", cleaned)
+    cleaned = re.sub(r"^(?:タイトル|title)[:：]\s*", "", cleaned, flags=re.IGNORECASE)
+    cleaned = cleaned.strip().strip('"').strip("'")
+    cleaned = re.sub(r"\s+", " ", cleaned)
+    return cleaned
+
+
+def deduplicate_topic_candidates(topic_candidates: list[str]) -> list[str]:
+    deduped: list[str] = []
+    for candidate in topic_candidates:
+        cleaned = clean_topic_candidate(candidate)
+        if len(cleaned) < 8:
+            continue
+        if any(text_similarity(cleaned, existing) >= 0.85 for existing in deduped):
+            continue
+        deduped.append(cleaned)
+    return deduped
+
+
+def parse_topic_candidates(raw_text: str) -> list[str]:
+    stripped = raw_text.strip()
+    start = stripped.find("[")
+    end = stripped.rfind("]")
+    if start != -1 and end != -1 and end > start:
+        json_block = stripped[start : end + 1]
+        try:
+            data = json.loads(json_block)
+            if isinstance(data, list):
+                return deduplicate_topic_candidates([str(item) for item in data])
+        except json.JSONDecodeError:
+            pass
+
+    candidates: list[str] = []
+    for line in stripped.splitlines():
+        cleaned = clean_topic_candidate(line)
+        if cleaned:
+            candidates.append(cleaned)
+    return deduplicate_topic_candidates(candidates)
+
+
+def generate_topic_candidates(
+    client: anthropic.Anthropic,
+    category_key: str,
+    category_ja: str,
+    topic_guidance: str,
+    category_keywords: list[str],
+    focus_keywords: list[str],
+    existing_posts: list[dict[str, object]],
+) -> list[str]:
+    prompt = build_topic_ideation_prompt(
+        category_key=category_key,
+        category_ja=category_ja,
+        topic_guidance=topic_guidance,
+        category_keywords=category_keywords,
+        focus_keywords=focus_keywords,
+        existing_posts=existing_posts,
+    )
+    message = client.messages.create(
+        model=MODEL_NAME,
+        max_tokens=1400,
+        temperature=0.9,
+        messages=[{"role": "user", "content": prompt}],
+    )
+    raw_text = extract_text_blocks(message)
+    candidates = parse_topic_candidates(raw_text)
+    if not candidates:
+        raise RuntimeError("テーマ候補の生成に失敗しました")
+    return candidates
+
+
 # ── プロンプト生成 ─────────────────────────────────────────
 
-def build_prompt(topic: str, category_ja: str) -> str:
+def build_prompt(
+    topic: str,
+    category_key: str,
+    category_ja: str,
+    related_posts: list[dict[str, object]],
+    attempt: int,
+    focus_keywords: list[str],
+) -> str:
+    profile = PROMPT_PROFILES[category_key]
+    must_cover = "\n".join(f"- {item}" for item in profile["must_cover"])
+    extra_rules = "\n".join(f"- {item}" for item in profile["extra_rules"])
+
+    keyword_block = ""
+    if focus_keywords:
+        keyword_block = f"""
+【テーマ生成時に参照したキーワード】
+- {" / ".join(focus_keywords)}
+- 記事全体の論点が、上記キーワードと自然につながるようにする
+"""
+
+    retry_note = ""
+    if attempt > 1:
+        retry_note = """
+【再生成時の追加指示】
+- 直前の生成結果は過去記事との切り口が近すぎました。
+- より具体的なユースケース、別の比較軸、別の失敗パターンに寄せて書き直してください。
+- タイトル・導入・見出し順・コード例が過去記事と似ないようにしてください。
+"""
+
     return f"""あなたはシステム開発会社「有限会社OpenWorks」のテックブログ執筆者です。
-以下のテーマで、エンジニアや技術に興味のあるビジネスパーソン向けの記事を日本語で書いてください。
+エンジニアやIT担当者が読んで「現場で使える」「判断材料になる」と感じる、日本語の実務寄りブログ記事を書いてください。
 
 テーマ: {topic}
 カテゴリ: {category_ja}
+{keyword_block}
 
-【要件】
-- 文字数: 800〜1200字程度
+【近い過去記事】
+{format_related_posts(related_posts)}
+
+【重複回避ルール】
+- 過去記事と同じタイトルにしない
+- 同じ導入、同じ見出し構成、同じコード例を繰り返さない
+- 近いテーマの場合は、より具体的なサブテーマ・別の比較軸・別の失敗例・別の設計判断に絞る
+- 過去記事で触れていない論点を中心に、追加価値がある内容にする
+{retry_note}
+
+【出力形式】
+- 1行目は必ず `タイトル: ...`
+- 本文はMarkdown形式で、H1は使わず `##` と `###` で構成する
+- 最後の1行は必ず `タグ: tag1, tag2, tag3`
+- 記事以外の前置き、補足説明、あとがきは出力しない
+
+【共通要件】
+- 文字数: {profile['length']}
 - 読者: Webエンジニア、モバイルエンジニア、IT担当者
 - トーン: 実務的・わかりやすい・親しみやすい（です・ます調）
-- 構成: 導入 → 本文（見出し2〜4つ） → まとめ
-- Markdown形式で書く（見出しは ## と ### を使用）
+- 見出し数: {profile['sections']}
+- 導入は一般論で引き延ばさず、現場で起こる具体的な課題や判断場面から始める
+- 説明は抽象論で終わらせず、設計判断・実装観点・運用上の注意まで踏み込む
+- 必要に応じて箇条書きやコードブロックを使う
 - コードブロックがあれば ```言語名 で囲む
-- 最後に3〜5個のタグをカンマ区切りで「タグ: tag1, tag2, tag3」の形式で1行追記する
 
-記事本文のみ出力してください（前置き・後書き不要）。
+【このカテゴリで必ず触れること】
+{must_cover}
+
+【追加ルール】
+{extra_rules}
 """
 
 
@@ -120,7 +519,6 @@ def build_prompt(topic: str, category_ja: str) -> str:
 
 def slugify(text: str) -> str:
     """日本語タイトルを英数字スラッグに変換（簡易版）"""
-    # ASCII以外を除去してハイフン繋ぎにする
     text = unicodedata.normalize("NFKC", text)
     text = re.sub(r"[^\w\s-]", "", text, flags=re.ASCII)
     text = re.sub(r"[\s_]+", "-", text).strip("-").lower()
@@ -128,33 +526,124 @@ def slugify(text: str) -> str:
 
 
 def make_filename(date: datetime.date, title_hint: str) -> str:
-    slug = slugify(title_hint)[:50] or "blog-post"
-    return f"_posts/{date.strftime('%Y-%m-%d')}-{slug}.md"
+    slug = slugify(title_hint)[:60] or "blog-post"
+    candidate = POSTS_DIR / f"{date.strftime('%Y-%m-%d')}-{slug}.md"
+    if not candidate.exists():
+        return str(candidate)
+
+    suffix = 2
+    while True:
+        alternative = POSTS_DIR / f"{date.strftime('%Y-%m-%d')}-{slug}-{suffix}.md"
+        if not alternative.exists():
+            return str(alternative)
+        suffix += 1
 
 
-# ── タグ抽出 ──────────────────────────────────────────────
+# ── 生成結果の整形 ─────────────────────────────────────────
 
-def extract_tags(body: str) -> tuple[str, list[str]]:
-    """本文末尾の「タグ: ...」行を取り出してリストで返す"""
-    lines = body.strip().splitlines()
+def sanitize_tags(tags: list[str]) -> list[str]:
+    cleaned_tags: list[str] = []
+    seen: set[str] = set()
+
+    for tag in tags:
+        normalized = re.sub(r"\s+", " ", tag).strip().strip('"').strip("'").strip("[]")
+        if not normalized:
+            continue
+        key = normalized.lower()
+        if key in seen:
+            continue
+        seen.add(key)
+        cleaned_tags.append(normalized)
+
+    return cleaned_tags[:5]
+
+
+def extract_article_parts(raw_text: str, fallback_title: str) -> tuple[str, str, list[str]]:
+    lines = raw_text.strip().splitlines()
+    title = fallback_title
     tags: list[str] = []
-    clean_lines = []
+    body_lines: list[str] = []
+
     for line in lines:
-        m = re.match(r"^タグ[:：]\s*(.+)$", line.strip())
-        if m:
-            tags = [t.strip() for t in m.group(1).split(",") if t.strip()]
-        else:
-            clean_lines.append(line)
-    return "\n".join(clean_lines).strip(), tags
+        stripped = line.strip()
+
+        title_match = re.match(r"^(?:タイトル|title)[:：]\s*(.+)$", stripped, flags=re.IGNORECASE)
+        if title_match:
+            title = title_match.group(1).strip().strip('"')
+            continue
+
+        tag_match = re.match(r"^タグ[:：]\s*(.+)$", stripped)
+        if tag_match:
+            tags = [tag.strip() for tag in tag_match.group(1).split(",") if tag.strip()]
+            continue
+
+        body_lines.append(line)
+
+    while body_lines and not body_lines[0].strip():
+        body_lines.pop(0)
+
+    if body_lines:
+        heading_match = re.match(r"^#\s+(.+)$", body_lines[0].strip())
+        if heading_match and text_similarity(heading_match.group(1), title) >= 0.9:
+            body_lines.pop(0)
+            while body_lines and not body_lines[0].strip():
+                body_lines.pop(0)
+
+    body = "\n".join(body_lines).strip()
+    return title or fallback_title, body, sanitize_tags(tags)
+
+
+def find_duplicate_posts(title: str, body: str, existing_posts: list[dict[str, object]]) -> list[dict[str, object]]:
+    duplicate_candidates: list[dict[str, object]] = []
+    body_sample = body[:1600]
+
+    for post in existing_posts:
+        title_score = text_similarity(title, str(post["title"]))
+        body_score = text_similarity(body_sample, str(post["body"])[:1600], n=3)
+        score = max(title_score, body_score)
+        if score <= 0:
+            continue
+        duplicate_candidates.append(
+            {
+                "post": post,
+                "score": score,
+                "title_score": title_score,
+                "body_score": body_score,
+            }
+        )
+
+    duplicate_candidates.sort(key=lambda item: item["score"], reverse=True)
+    return duplicate_candidates[:MAX_RELATED_POSTS]
+
+
+def should_retry_generation(duplicate_candidates: list[dict[str, object]]) -> bool:
+    if not duplicate_candidates:
+        return False
+
+    best_match = duplicate_candidates[0]
+    return (
+        best_match["title_score"] >= TITLE_DUPLICATE_THRESHOLD
+        or best_match["body_score"] >= BODY_DUPLICATE_THRESHOLD
+    )
+
+
+def extract_text_blocks(message: anthropic.types.Message) -> str:
+    chunks = [block.text for block in message.content if getattr(block, "type", None) == "text"]
+    return "\n".join(chunks).strip()
 
 
 # ── Jekyll フロントマター生成 ──────────────────────────────
 
+def escape_yaml_string(value: str) -> str:
+    return value.replace('"', '\\"')
+
+
 def build_frontmatter(title: str, date: datetime.date, category: str, tags: list[str]) -> str:
-    tag_str = ", ".join(f'"{t}"' for t in tags)
+    escaped_title = escape_yaml_string(title)
+    tag_str = ", ".join(f'"{escape_yaml_string(tag)}"' for tag in tags)
     return f"""---
 layout: post
-title: "{title}"
+title: "{escaped_title}"
 date: {date.strftime('%Y-%m-%d')}
 categories: {category}
 tags: [{tag_str}]
@@ -170,52 +659,105 @@ def main():
     if not api_key:
         raise RuntimeError("ANTHROPIC_API_KEY が設定されていません")
 
-    # 自由テーマが指定されていればそれを使う
+    existing_posts = load_existing_posts()
+    print(f"既存記事数: {len(existing_posts)}")
+
+    client = anthropic.Anthropic(api_key=api_key)
+    focus_keywords: list[str] = []
     free_topic = os.environ.get("TOPIC", "").strip()
     category_key = os.environ.get("CATEGORY", "random").lower()
     if free_topic:
         topic = free_topic
-        # 自由テーマでもカテゴリ指定があればそれを使う
         if category_key in CATEGORIES:
             config = CATEGORIES[category_key]
         else:
             config = CATEGORIES["tech-verification"]
+        related_posts = find_related_posts(topic, existing_posts)
         print(f"自由テーマ: {topic}")
     else:
-        # カテゴリから自動選択
-        category_key = os.environ.get("CATEGORY", "random").lower()
         if category_key not in CATEGORIES:
             category_key = random.choice(list(CATEGORIES.keys()))
         config = CATEGORIES[category_key]
-        topic = random.choice(config["topics"])
+        focus_keywords = choose_focus_keywords(
+            config["keywords"],
+            config["focus_keyword_count"],
+        )
+        topic_candidates = generate_topic_candidates(
+            client=client,
+            category_key=config["category"],
+            category_ja=config["category_ja"],
+            topic_guidance=config["topic_guidance"],
+            category_keywords=config["keywords"],
+            focus_keywords=focus_keywords,
+            existing_posts=existing_posts,
+        )
+        topic, related_posts = choose_topic(topic_candidates, existing_posts)
         print(f"カテゴリ: {config['category_ja']}")
+        if focus_keywords:
+            print(f"発想キーワード: {' / '.join(focus_keywords)}")
+        print(f"テーマ候補数: {len(topic_candidates)}")
         print(f"テーマ: {topic}")
 
-    # Claude API で記事生成
-    client = anthropic.Anthropic(api_key=api_key)
-    message = client.messages.create(
-        model="claude-haiku-4-5-20251001",
-        max_tokens=2048,
-        messages=[
-            {"role": "user", "content": build_prompt(topic, config["category_ja"])}
-        ],
-    )
-    raw_body = message.content[0].text
+    generated_title = topic
+    body = ""
+    tags: list[str] = []
+    duplicate_candidates: list[dict[str, object]] = []
 
-    # タグ抽出
-    body, tags = extract_tags(raw_body)
+    for attempt in range(1, MAX_GENERATION_ATTEMPTS + 1):
+        if related_posts:
+            print(f"近い既存記事: {render_similarity_hint(related_posts)}")
 
-    # ファイル保存
+        message = client.messages.create(
+            model=MODEL_NAME,
+            max_tokens=3200,
+            temperature=0.7,
+            messages=[
+                {
+                    "role": "user",
+                    "content": build_prompt(
+                        topic=topic,
+                        category_key=config["category"],
+                        category_ja=config["category_ja"],
+                        related_posts=related_posts,
+                        attempt=attempt,
+                        focus_keywords=focus_keywords,
+                    ),
+                }
+            ],
+        )
+        raw_text = extract_text_blocks(message)
+        generated_title, body, tags = extract_article_parts(raw_text, topic)
+
+        if not body:
+            raise RuntimeError("記事本文の生成に失敗しました")
+
+        duplicate_candidates = find_duplicate_posts(generated_title, body, existing_posts)
+        if attempt < MAX_GENERATION_ATTEMPTS and should_retry_generation(duplicate_candidates):
+            print(
+                "⚠️ 過去記事との類似度が高いため再生成します: "
+                f"{render_similarity_hint(duplicate_candidates)}"
+            )
+            related_posts = duplicate_candidates
+            continue
+        break
+
+    if should_retry_generation(duplicate_candidates):
+        print(
+            "⚠️ 近い既存記事があります。公開前に内容確認を推奨します: "
+            f"{render_similarity_hint(duplicate_candidates)}"
+        )
+
     today = datetime.date.today()
-    filename = make_filename(today, topic)
-    frontmatter = build_frontmatter(topic, today, config["category"], tags)
+    filename = make_filename(today, generated_title)
+    frontmatter = build_frontmatter(generated_title, today, config["category"], tags)
     content = frontmatter + "\n" + body + "\n"
 
-    os.makedirs("_posts", exist_ok=True)
-    with open(filename, "w", encoding="utf-8") as f:
-        f.write(content)
+    os.makedirs(POSTS_DIR, exist_ok=True)
+    with open(filename, "w", encoding="utf-8") as file:
+        file.write(content)
 
     print(f"✅ 保存しました: {filename}")
+    print(f"   タイトル: {generated_title}")
     print(f"   タグ: {tags}")
 
 

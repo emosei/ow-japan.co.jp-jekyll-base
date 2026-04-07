@@ -228,6 +228,37 @@ def sort_posts_by_recency(existing_posts: list[dict[str, object]]) -> list[dict[
     return sorted(existing_posts, key=lambda post: str(post["date"]), reverse=True)
 
 
+def find_latest_category_for_date(existing_posts: list[dict[str, object]], target_date: datetime.date) -> str | None:
+    target_date_str = target_date.isoformat()
+    for post in sort_posts_by_recency(existing_posts):
+        if str(post["date"]) != target_date_str:
+            continue
+        category = str(post["category"]).strip()
+        if category:
+            return category
+    return None
+
+
+def choose_category_key(
+    requested_category: str,
+    existing_posts: list[dict[str, object]],
+    today: datetime.date,
+) -> str:
+    if requested_category in CATEGORIES:
+        return requested_category
+
+    available_categories = list(CATEGORIES.keys())
+    latest_category_today = find_latest_category_for_date(existing_posts, today)
+
+    if latest_category_today in available_categories and len(available_categories) > 1:
+        filtered_categories = [category for category in available_categories if category != latest_category_today]
+        if filtered_categories:
+            print(f"本日の直前カテゴリを回避: {latest_category_today}")
+            return random.choice(filtered_categories)
+
+    return random.choice(available_categories)
+
+
 def find_related_posts(topic: str, existing_posts: list[dict[str, object]], limit: int = MAX_RELATED_POSTS) -> list[dict[str, object]]:
     related_posts: list[dict[str, object]] = []
     for post in existing_posts:
@@ -659,6 +690,7 @@ def main():
     if not api_key:
         raise RuntimeError("ANTHROPIC_API_KEY が設定されていません")
 
+    today = datetime.date.today()
     existing_posts = load_existing_posts()
     print(f"既存記事数: {len(existing_posts)}")
 
@@ -675,8 +707,7 @@ def main():
         related_posts = find_related_posts(topic, existing_posts)
         print(f"自由テーマ: {topic}")
     else:
-        if category_key not in CATEGORIES:
-            category_key = random.choice(list(CATEGORIES.keys()))
+        category_key = choose_category_key(category_key, existing_posts, today)
         config = CATEGORIES[category_key]
         focus_keywords = choose_focus_keywords(
             config["keywords"],
@@ -747,7 +778,6 @@ def main():
             f"{render_similarity_hint(duplicate_candidates)}"
         )
 
-    today = datetime.date.today()
     filename = make_filename(today, generated_title)
     frontmatter = build_frontmatter(generated_title, today, config["category"], tags)
     content = frontmatter + "\n" + body + "\n"

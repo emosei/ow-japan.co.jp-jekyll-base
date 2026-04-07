@@ -14,8 +14,10 @@ section_id: blog
   </div>
 </div>
 
-{% if paginator.posts.size > 0 %}
-  {% for post in paginator.posts %}
+{% assign posts = paginator.posts | default: site.posts %}
+
+{% if posts.size > 0 %}
+  {% for post in posts %}
   <article class="post-card">
     <div class="post-meta">
       <time>{{ post.date | date: "%Y年%m月%d日" }}</time>
@@ -45,4 +47,6 @@ section_id: blog
   </div>
 {% endif %}
 
-{% include pagination.html root="blog" %}
+{% if paginator and paginator.total_pages > 1 %}
+  {% include pagination.html root="blog" %}
+{% endif %}

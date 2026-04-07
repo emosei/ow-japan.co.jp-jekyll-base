@@ -124,6 +124,30 @@ PROMPT_PROFILES = {
     },
 }
 
+AUTHOR_PERSONA = {
+    "identity": [
+        "小規模なIT企業を起業して経営している人物だが、その立場を過剰にアピールしない",
+        "40代後半のベテランエンジニアで、現場で叩き上げられてきた技術者",
+        "独学ベースでコンピュータサイエンスを学んできた",
+        "限られた顧客から継続的に仕事を得ており、信頼関係の中で案件を任されている",
+    ],
+    "experience": [
+        "基幹系では大手旅行会社向けシステムを複数担当してきた",
+        "例として、ANAスカイホリデーの予約システム、日本旅行の予約システム、近畿日本ツーリストの予約管理システム、JRえきねっとの販売店システムに関わってきた",
+        "加えて、GDOスコアのモバイルアプリ、IODataのデバイス向けアプリ、お弁当宅配サービス、商店街向けホームページおよびアプリ、デジタルコンテンツ販売サイト構築なども経験している",
+    ],
+    "voice": [
+        "人を頭ごなしに否定せず、穏やかで優しい語り口",
+        "ただし技術や設計の甘さには厳しく、論点は鋭く切り分ける",
+        "理論の引用だけでなく、現場で起きる問題、運用、保守、制約まで踏まえて語る",
+    ],
+    "rules": [
+        "記事本文では毎回自己紹介しない",
+        "顧客名や実績を並べて権威づけしない。必要なら経験に裏打ちされた視点として自然ににじませる",
+        "上から目線にせず、実務の難しさに敬意を払う",
+    ],
+}
+
 
 # ── 類似度計算と既存記事読み込み ────────────────────────────
 
@@ -342,6 +366,26 @@ def choose_focus_keywords(keywords: list[str], count: int) -> list[str]:
     return random.sample(keywords, count)
 
 
+def format_author_persona() -> str:
+    identity = "\n".join(f"- {item}" for item in AUTHOR_PERSONA["identity"])
+    experience = "\n".join(f"- {item}" for item in AUTHOR_PERSONA["experience"])
+    voice = "\n".join(f"- {item}" for item in AUTHOR_PERSONA["voice"])
+    rules = "\n".join(f"- {item}" for item in AUTHOR_PERSONA["rules"])
+    return f"""【書き手のペルソナ】
+人物像:
+{identity}
+
+経験領域:
+{experience}
+
+文体と視点:
+{voice}
+
+扱い方のルール:
+{rules}
+"""
+
+
 # ── テーマ候補生成 ────────────────────────────────────────
 
 def build_topic_ideation_prompt(
@@ -372,6 +416,8 @@ def build_topic_ideation_prompt(
 
     return f"""あなたはシステム開発会社「有限会社OpenWorks」の編集者です。
 テックブログ用に、新しい記事テーマ案だけを考えてください。
+
+{format_author_persona()}
 
 カテゴリ: {category_ja}
 カテゴリの方向性: {topic_guidance}
@@ -507,6 +553,8 @@ def build_prompt(
 
     return f"""あなたはシステム開発会社「有限会社OpenWorks」のテックブログ執筆者です。
 エンジニアやIT担当者が読んで「現場で使える」「判断材料になる」と感じる、日本語の実務寄りブログ記事を書いてください。
+
+{format_author_persona()}
 
 テーマ: {topic}
 カテゴリ: {category_ja}
